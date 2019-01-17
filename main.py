@@ -1,0 +1,57 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+@file: main.py
+@email: 412425870@qq.com
+@author: caychen
+@pythonVersion: Python3.7
+@function:
+@version: v2.0-重构结构
+"""
+
+from follow.Follow import __get_none_follow
+from login.Login import phone_login
+from playlist.Playlist import __get_playlist, __remove_duplicate_song
+
+"参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
+
+Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲']
+
+
+def show_menu():
+    """
+        Show the main menu for user to select the option.
+    """
+    print('*' * 6 + '菜单' + '*' * 6)
+    for (index, menu) in enumerate(Menus):
+        print(' ' * 3 + '(' + str(index + 1) + '): ' + menu + ' ' * 3)
+
+
+if __name__ == '__main__':
+    # 手机号登录
+    response = phone_login()
+    response = response.json()
+
+    while True:
+        # 显示菜单
+        show_menu()
+        try:
+            index = input('请输入序号: ').strip().lower()
+            if index == '':
+                raise KeyError
+
+            index = int(index)
+            if index in list(range(1, len(Menus) + 1)):
+                {
+                    1: __get_none_follow(response),  # __get_none_follow,
+                    2: __get_playlist(response),  # __get_playlist
+                    3: __remove_duplicate_song(),  # __remove_duplicate_song
+                }[index]
+
+        except (KeyError, InterruptedError):
+            print('输入错误...')
+        except Exception as reason:
+            print(reason)
+        else:
+            exit(0)
