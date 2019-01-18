@@ -7,7 +7,7 @@
 @author: caychen
 @pythonVersion: Python3.7
 @function:
-@version: v2.1-私有歌单（未整理）去重歌曲功能
+@version: v2.2-注销退出功能
 """
 
 from follow.Follow import __get_none_follow

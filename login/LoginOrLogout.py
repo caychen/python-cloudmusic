@@ -4,7 +4,7 @@ from configparser import ConfigParser
 
 import requests
 
-from common.Constant import headers, set_session, set_csrf, phone_login_url
+from common.Constant import headers, set_session, set_csrf, phone_login_url, csrf, get_session, logout_url
 from encrypt.Encrypt import encrypted_request
 
 
@@ -46,5 +46,17 @@ def phone_login():
 
     return response
 
-def __logout():
-    return
+
+def __logout(response):
+    req_text = {
+        "csrf_token": csrf
+    }
+
+    data = encrypted_request(req_text)
+    response = get_session().post(logout_url, data=data, headers=headers)
+    response.encoding = 'UTF-8'
+    r = response.json()
+    if r.get('code') == 200:
+        exit(0)
+    else:
+        exit(-1)
