@@ -17,19 +17,23 @@ def __parser(_list):
 
 def __get_none_follow(response):
     if 'account' in response:
-        user_id = response['account']['id']
-        none_follows_nickname = []
-        offset = 0
-        while True:
-            response = __get_follows(user_id, offset)
-            follows = response.get('follow')
-            none_follows_nickname.extend(each for each in __parser(follows))
-            more = response.get('more')
-            if more:
-                offset += limit
-            else:
-                break
+        try:
+            user_id = response['account']['id']
+            none_follows_nickname = []
+            offset = 0
+            while True:
+                response = __get_follows(user_id, offset)
+                follows = response.get('follow')
+                none_follows_nickname.extend(each for each in __parser(follows))
+                more = response.get('more')
+                if more:
+                    offset += limit
+                else:
+                    break
+            print("不在关注列表中的：", none_follows_nickname)
 
-        print("不在关注列表中的：", none_follows_nickname)
+        except Exception as reason:
+            print(reason)
+            return
     else:
         print(response.get('msg'))

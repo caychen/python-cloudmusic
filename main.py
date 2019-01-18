@@ -11,12 +11,12 @@
 """
 
 from follow.Follow import __get_none_follow
-from login.Login import phone_login
+from login.LoginOrLogout import phone_login, __logout
 from playlist.Playlist import __get_playlist, __remove_duplicate_song
 
 "参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
 
-Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲']
+Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲', '退出']
 
 
 def show_menu():
@@ -42,16 +42,20 @@ if __name__ == '__main__':
                 raise KeyError
 
             index = int(index)
-            if index in list(range(1, len(Menus) + 1)):
+            if index == 0:
+                # 退出
+                exit(0)
+
+            elif index in list(range(1, len(Menus) + 1)):
                 {
-                    1: __get_none_follow(response),  # __get_none_follow,
-                    2: __get_playlist(response),  # __get_playlist
-                    3: __remove_duplicate_song(),  # __remove_duplicate_song
-                }[index]
+                    1: __get_none_follow,  # __get_none_follow,
+                    2: __get_playlist,  # __get_playlist
+                    3: __remove_duplicate_song,  # __remove_duplicate_song
+                    4: __logout,
+                }[index](response)
+            print()
 
         except (KeyError, InterruptedError):
             print('输入错误...')
         except Exception as reason:
-            print(reason)
-        else:
-            exit(0)
+            print('main方法捕获异常：', reason)

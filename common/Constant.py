@@ -15,6 +15,16 @@ limit = 20
 profiles = 'https://music.163.com/#/user/home?id='
 # 手机号登录请求的url
 phone_login_url = 'https://music.163.com/weapi/login/cellphone'
+# 个人歌单url
+playlist_url = 'https://music.163.com/weapi/user/playlist?csrf_token='
+# 歌单详情url
+playlist_detail_url = 'http://music.163.com/weapi/v3/playlist/detail?csrf_token='
+# 歌曲详情uro
+song_detail_url = 'http://music.163.com/weapi/song/detail?csrf_token='
+# 删除歌单中的歌曲url
+remove_song_url = 'https://music.163.com/weapi/playlist/manipulate/tracks?csrf_token='
+# 退出网易云的url
+logout_url = 'https://music.163.com/weapi/logout?csrf_token='
 
 # 请求头
 headers = {
@@ -23,8 +33,13 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0'
 }
 
+public_playlist_code = 0
+private_playlist_code = 10
+
 session = None
 csrf = None
+private_playlist_sheets = []
+public_playlist_sheets = []
 
 
 def set_session(s):
