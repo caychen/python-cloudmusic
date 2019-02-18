@@ -38,8 +38,6 @@ private_playlist_code = 10
 
 session = None
 csrf = None
-private_playlist_sheets = []
-public_playlist_sheets = []
 
 
 def set_session(s):

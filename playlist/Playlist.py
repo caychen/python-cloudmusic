@@ -1,8 +1,13 @@
-from common.Constant import csrf, get_session, headers, playlist_url, private_playlist_sheets, \
-    public_playlist_sheets, public_playlist_code, private_playlist_code, playlist_detail_url, get_csrf, song_detail_url, \
+from common.Constant import csrf, get_session, headers, playlist_url, public_playlist_code, private_playlist_code, \
+    playlist_detail_url, get_csrf, song_detail_url, \
     remove_song_url
 from encrypt.Encrypt import encrypted_request
 from entity.SongSheet import SongSheet
+
+private_playlist_sheets = []
+public_playlist_sheets = []
+private_playlist_sheet_ids = []
+public_playlist_sheet_ids = []
 
 
 def __get_playlist(response):
@@ -35,9 +40,11 @@ def __get_playlist(response):
 
                     if s['privacy'] == private_playlist_code:
                         private_playlist_sheets.append(song_sheet)
+                        private_playlist_sheet_ids.append(s['id'])
 
                     if s['privacy'] == public_playlist_code:
                         public_playlist_sheets.append(song_sheet)
+                        public_playlist_sheet_ids.append(s['id'])
 
                 else:
                     break
@@ -55,13 +62,7 @@ def __get_playlist(response):
     print('')
 
 
-public_song_ids = []
-private_song_ids = []
-
-private_exist_song_ids = []
-
-
-def __get_list(playlist_sheets, privacy):
+def __get_list(playlist_sheets):
     req_text = {
         "id": '',
         "offset": 1000,
@@ -71,9 +72,11 @@ def __get_list(playlist_sheets, privacy):
         "csrf_token": csrf
     }
 
+    song_ids = []
+
     try:
         for playlist_sheet in playlist_sheets:
-            req_text['id'] = playlist_sheet.id
+            req_text['id'] = playlist_sheet
 
             data = encrypted_request(req_text)
 
@@ -82,10 +85,9 @@ def __get_list(playlist_sheets, privacy):
             r = response.json()
 
             track_ids = r.get('playlist').get('trackIds')
-            if privacy == public_playlist_code:
-                public_song_ids.extend(track_id.get('id') for track_id in track_ids)
-            elif privacy == private_playlist_code:
-                private_song_ids.extend(track_id.get('id') for track_id in track_ids)
+            song_ids.extend(track_id.get('id') for track_id in track_ids)
+
+        return song_ids
     except Exception as reason:
         print('__get_list方法捕获异常：', reason)
         raise Exception
@@ -128,17 +130,18 @@ def __remove_song(song_sheet_id, song_ids):
 
 
 def __remove_duplicate_song(response):
+    private_exist_song_ids = []
     try:
         if len(public_playlist_sheets) == 0:
             __get_playlist(response)
 
         # 获取所有已整理的歌曲id（只需执行一次）
-        __get_list(public_playlist_sheets, public_playlist_code)
+        public_song_ids = __get_list(public_playlist_sheet_ids)
 
         # 遍历未整理的歌单id
         for private_playlist_sheet in private_playlist_sheets:
             # 获取指定私有歌单中的歌曲id
-            __get_list([private_playlist_sheet], private_playlist_code)
+            private_song_ids = __get_list([private_playlist_sheet.id])
 
             # 遍历私有歌单中的歌曲id
             for private_song_id in private_song_ids:
@@ -169,3 +172,48 @@ def __remove_duplicate_song(response):
     except Exception as reason:
         print('__remove_duplicate_song方法捕获异常：', reason)
         raise Exception
+
+
+def __each_remove_duplicate_song(response):
+    try:
+        if len(private_playlist_sheets) == 0:
+            __get_playlist(response)
+
+        # 如果还是等于0，则该功能直接退出
+        if len(private_playlist_sheets) == 0:
+            return
+
+        id1 = int(input("请输入私有歌单id1 = ").strip())
+        id2 = int(input("请输入私有歌单id2 = ").strip())
+
+        __remove_each(id1, id2)
+        __remove_each(id2, id1)
+
+    except Exception as reason:
+        print('__each_remove_duplicate_song方法捕获异常：', reason)
+        raise Exception
+
+
+def __remove_each(id1, id2):
+    exist_song_id_1_in_2 = []
+    song_ids1 = __get_list([id1])
+    song_ids2 = __get_list([id2])
+
+    for song_id in song_ids1:
+        if song_id in song_ids2:
+            exist_song_id_1_in_2.append(song_id)
+
+    if len(exist_song_id_1_in_2) != 0:
+        songs_detail = __get_songs_detail(exist_song_id_1_in_2).get('songs')
+        exist_song_names = []
+        for song_detail in songs_detail:
+            exist_song_names.append(song_detail.get('name'))
+
+        if len(exist_song_names) != 0:
+            print('私有歌单[' + str(id1) + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
+        else:
+            print('私有歌单[' + str(id1) + ']无有重复歌曲')
+    # 进行删除
+    if len(exist_song_id_1_in_2) != 0:
+        __remove_song(id1, exist_song_id_1_in_2)
+    print('')
