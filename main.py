@@ -12,11 +12,11 @@
 
 from follow.Follow import __get_none_follow
 from login.LoginOrLogout import phone_login, __logout
-from playlist.Playlist import __get_playlist, __remove_duplicate_song
+from playlist.Playlist import __get_playlist, __remove_duplicate_song, __each_remove_duplicate_song
 
 "参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
 
-Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲', '退出']
+Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲', '相互排除未整理的重复歌曲', '退出']
 
 
 def show_menu():
@@ -51,7 +51,8 @@ if __name__ == '__main__':
                     1: __get_none_follow,  # __get_none_follow,
                     2: __get_playlist,  # __get_playlist
                     3: __remove_duplicate_song,  # __remove_duplicate_song
-                    4: __logout,
+                    4: __each_remove_duplicate_song,
+                    5: __logout,
                 }[index](response)
             print()
 
