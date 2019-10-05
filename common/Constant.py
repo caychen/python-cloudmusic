@@ -19,12 +19,14 @@ phone_login_url = 'https://music.163.com/weapi/login/cellphone'
 playlist_url = 'https://music.163.com/weapi/user/playlist?csrf_token='
 # 歌单详情url
 playlist_detail_url = 'http://music.163.com/weapi/v3/playlist/detail?csrf_token='
-# 歌曲详情uro
+# 歌曲详情url
 song_detail_url = 'http://music.163.com/weapi/song/detail?csrf_token='
 # 删除歌单中的歌曲url
 remove_song_url = 'https://music.163.com/weapi/playlist/manipulate/tracks?csrf_token='
 # 退出网易云的url
 logout_url = 'https://music.163.com/weapi/logout?csrf_token='
+# 获取歌曲URL
+playsheet_detail_url = "http://music.163.com/weapi/song/enhance/player/url?csrf_token="
 
 # 请求头
 headers = {

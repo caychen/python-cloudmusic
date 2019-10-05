@@ -1,6 +1,6 @@
 from common.Constant import csrf, get_session, headers, playlist_url, public_playlist_code, private_playlist_code, \
     playlist_detail_url, get_csrf, song_detail_url, \
-    remove_song_url
+    remove_song_url, playsheet_detail_url
 from encrypt.Encrypt import encrypted_request
 from entity.SongSheet import SongSheet
 
@@ -8,6 +8,39 @@ private_playlist_sheets = []
 public_playlist_sheets = []
 private_playlist_sheet_ids = []
 public_playlist_sheet_ids = []
+
+
+def __get_playsheet_detail(response):
+    have_down_song_ids = []
+    req = {
+        "ids": [],
+        "br": 0,
+        "csrf_token": get_csrf()
+    }
+
+    sheet_id = int(input("请输入歌单id = ").strip())
+
+    # if len(private_playlist_sheets) == 0:
+    #    __get_playlist(response)
+
+    play_sheet_id = [sheet_id]
+    public_song_ids = __get_list(play_sheet_id)
+
+    # for private_playlist_sheet in private_playlist_sheets:
+    #     private_song_ids = __get_list([private_playlist_sheet.id])
+
+    req["ids"].extend(public_song_ids)
+
+    data = encrypted_request(req)
+    response = get_session().post(playsheet_detail_url + get_csrf(), data=data, headers=headers)
+    response.encoding = "UTF-8"
+    r = response.json()
+    details = r.get('data')
+    for d in details:
+        if d.get("code") == 404:
+            have_down_song_ids.append(d.get("id"))
+
+    print(have_down_song_ids)
 
 
 def __get_playlist(response):
