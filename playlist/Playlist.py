@@ -126,6 +126,12 @@ def __get_list(playlist_sheets):
         raise Exception
 
 
+def __get_single_song_detail(response):
+    id = int(input("请输入歌曲id = ").strip())
+    r = __get_songs_detail([id])
+    print(r)
+
+
 def __get_songs_detail(song_ids):
     req_text = {
         'ids': song_ids
@@ -207,6 +213,24 @@ def __remove_duplicate_song(response):
         raise Exception
 
 
+def __foreach_remove_duplicate_song(response):
+    try:
+        if len(private_playlist_sheets) == 0:
+            __get_playlist(response)
+
+        # 如果还是等于0，则该功能直接退出
+        if len(private_playlist_sheets) == 0:
+            return
+
+        for i in range(len(private_playlist_sheets)):
+            for j in range(len(private_playlist_sheets)):
+                if i != j:
+                    __remove_each(private_playlist_sheets[i].id, private_playlist_sheets[j].id)
+
+    except Exception as reason:
+        print('__each_remove_duplicate_song方法捕获异常：', reason)
+        raise Exception
+
 def __each_remove_duplicate_song(response):
     try:
         if len(private_playlist_sheets) == 0:
@@ -228,6 +252,7 @@ def __each_remove_duplicate_song(response):
 
 
 def __remove_each(id1, id2):
+    print('当前id1：' + str(id1) + ', id2:' + str(id2))
     exist_song_id_1_in_2 = []
     song_ids1 = __get_list([id1])
     song_ids2 = __get_list([id2])
