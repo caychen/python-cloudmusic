@@ -5,19 +5,32 @@
 @file: main.py
 @email: 412425870@qq.com
 @author: caychen
-@pythonVersion: Python3.7
+@pythonVersion: Python3.8
 @function:
-@version: v2.2-注销退出功能
+@version: v2.5-增加删除下架歌曲和试听歌曲
 """
 
 from follow.Follow import __get_none_follow
 from login.LoginOrLogout import phone_login, __logout
-from playlist.Playlist import __get_playlist, __remove_duplicate_song, __each_remove_duplicate_song, \
-    __get_playsheet_detail, __foreach_remove_duplicate_song, __get_single_song_detail
+from playlist.Playlist import __get_playlist, \
+    __remove_duplicate_song, \
+    __each_remove_duplicate_song, \
+    __remove_single_playsheet_down_trial_songs, \
+    __foreach_remove_duplicate_song, \
+    __get_single_song_detail, \
+    __remove_down_trial_song_from_all_private
 
 "参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
 
-Menus = ['关注人列表', '获取歌单', '排除未整理的重复歌曲', '相互排除未整理的重复歌曲', '循环删除未整理的重复歌曲（自动）', '删除下架歌曲', '获取歌曲信息', '退出']
+Menus = ['关注人列表',
+         '获取歌单',
+         '排除未整理的重复歌曲',
+         '相互排除未整理的重复歌曲',
+         '循环删除未整理的重复歌曲（自动）',
+         '获取歌曲信息',
+         '删除某个歌单中的下架歌曲和试听歌曲',
+         '删除所有私有歌单中的下架歌曲和试听歌曲',
+         '退出']
 
 
 def show_menu():
@@ -54,9 +67,11 @@ if __name__ == '__main__':
                     3: __remove_duplicate_song,  # __remove_duplicate_song
                     4: __each_remove_duplicate_song,
                     5: __foreach_remove_duplicate_song,
-                    6: __get_playsheet_detail, # https://github.com/darknessomi/musicbox/wiki/%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90%E6%96%B0%E7%89%88WebAPI%E5%88%86%E6%9E%90%E3%80%82
-                    7: __get_single_song_detail,
-                    8: __logout,
+                    6: __get_single_song_detail,
+                    7: __remove_single_playsheet_down_trial_songs,
+                    # https://github.com/darknessomi/musicbox/wiki/%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90%E6%96%B0%E7%89%88WebAPI%E5%88%86%E6%9E%90%E3%80%82
+                    8: __remove_down_trial_song_from_all_private,
+                    9: __logout,
                 }[index](response)
             print()
 

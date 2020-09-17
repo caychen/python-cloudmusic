@@ -1,8 +1,12 @@
+import json
+
 from common.Constant import csrf, get_session, headers, playlist_url, public_playlist_code, private_playlist_code, \
     playlist_detail_url, get_csrf, song_detail_url, \
     remove_song_url, playsheet_detail_url
 from encrypt.Encrypt import encrypted_request
+from entity.Song import Song
 from entity.SongSheet import SongSheet
+from utils import ListUtil
 
 private_playlist_sheets = []
 public_playlist_sheets = []
@@ -10,37 +14,77 @@ private_playlist_sheet_ids = []
 public_playlist_sheet_ids = []
 
 
-def __get_playsheet_detail(response):
-    have_down_song_ids = []
-    req = {
-        "ids": [],
-        "br": 0,
-        "csrf_token": get_csrf()
-    }
-
-    sheet_id = int(input("请输入歌单id = ").strip())
+def __remove_single_playsheet_down_trial_songs(response):
+    sheet_id = int(input("输入歌单信息id").strip())
 
     # if len(private_playlist_sheets) == 0:
     #    __get_playlist(response)
 
+    __del_songs_where_down_trial(sheet_id)
+
+
+def __del_songs_where_down_trial(sheet_id):
     play_sheet_id = [sheet_id]
-    public_song_ids = __get_list(play_sheet_id)
+    song_ids = __get_list(play_sheet_id)
+    have_down_song_ids = []  # 下架歌曲
+    only_trial_song_ids = []  # 试听歌曲
+    __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids)
 
-    # for private_playlist_sheet in private_playlist_sheets:
-    #     private_song_ids = __get_list([private_playlist_sheet.id])
+    # 删除下架歌曲
+    __remove_down_songs(sheet_id, have_down_song_ids)
 
-    req["ids"].extend(public_song_ids)
+    # 删除试听歌曲
+    __remove_trial_songs(sheet_id, only_trial_song_ids)
 
-    data = encrypted_request(req)
-    response = get_session().post(playsheet_detail_url + get_csrf(), data=data, headers=headers)
-    response.encoding = "UTF-8"
-    r = response.json()
-    details = r.get('data')
-    for d in details:
-        if d.get("code") == 404:
-            have_down_song_ids.append(d.get("id"))
 
-    print(have_down_song_ids)
+def __remove_down_songs(playsheet_id, have_down_song_ids):
+    if len(have_down_song_ids) != 0:
+        have_down_song_result = __get_songs_detail(have_down_song_ids).get("songs")
+        print("下架歌曲, 即将从[" + str(playsheet_id) + "]歌单中删除，数量：[" + str(len(have_down_song_result)) + "]")
+        for r in have_down_song_result:
+            print(Song(r.get('id'), r.get('name')))
+
+        # 删除
+        __remove_song(playsheet_id, have_down_song_ids)
+        print('')
+
+
+def __remove_trial_songs(playsheet_id, only_trial_song_ids):
+    if len(only_trial_song_ids) != 0:
+        only_trial_song_result = __get_songs_detail(only_trial_song_ids).get("songs")
+        print("试听歌曲, 即将从[" + str(playsheet_id) + "]歌单中删除，数量：[" + str(len(only_trial_song_result)) + "]")
+        for r in only_trial_song_result:
+            print(Song(r.get('id'), r.get('name')))
+
+        # 删除
+        __remove_song(playsheet_id, only_trial_song_ids)
+        print('')
+
+
+def __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids):
+    req = {
+        "ids": [],
+        "br": 999000,  # 码率,默认设置了 999000 即最大码率，如果要 320k 则可设置为 320000,其他类推
+        "csrf_token": get_csrf()
+    }
+
+    split_arrays = ListUtil.list_split(song_ids, 500)
+
+    for sa in split_arrays:
+        req["ids"].clear()
+
+        req["ids"].extend(sa)
+        data = encrypted_request(req)
+        response = get_session().post(playsheet_detail_url + get_csrf(), data=data, headers=headers)
+        response.encoding = "UTF-8"
+        r = response.json()
+        details = r.get('data')
+
+        for d in details:
+            if d.get("code") == 404:  # 404表示歌曲已经下架
+                have_down_song_ids.append(d.get("id"))
+            if d.get("code") == -110:  # -110表示歌曲只能试听
+                only_trial_song_ids.append(d.get("id"))
 
 
 def __get_playlist(response):
@@ -126,6 +170,15 @@ def __get_list(playlist_sheets):
         raise Exception
 
 
+# 删除下架歌曲和试听歌曲
+def __remove_down_trial_song_from_all_private(response):
+    if len(private_playlist_sheets) == 0:
+        __get_playlist(response)
+
+    for p in private_playlist_sheet_ids:
+        __del_songs_where_down_trial(p)
+
+
 def __get_single_song_detail(response):
     id = int(input("请输入歌曲id = ").strip())
     r = __get_songs_detail([id])
@@ -133,6 +186,9 @@ def __get_single_song_detail(response):
 
 
 def __get_songs_detail(song_ids):
+    if len(song_ids) == 0:
+        return dict(songs=[])
+
     req_text = {
         'ids': song_ids
     }
@@ -203,6 +259,7 @@ def __remove_duplicate_song(response):
 
             # 进行删除
             if len(private_exist_song_ids) != 0:
+                print("即将从[" + str(private_playlist_sheet.id) + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
                 __remove_song(private_playlist_sheet.id, private_exist_song_ids)
 
             # 清空
@@ -230,6 +287,7 @@ def __foreach_remove_duplicate_song(response):
     except Exception as reason:
         print('__each_remove_duplicate_song方法捕获异常：', reason)
         raise Exception
+
 
 def __each_remove_duplicate_song(response):
     try:
@@ -273,5 +331,6 @@ def __remove_each(id1, id2):
             print('私有歌单[' + str(id1) + ']无有重复歌曲')
     # 进行删除
     if len(exist_song_id_1_in_2) != 0:
+        print("即将从[" + str(id1) + "]歌单中删除，数量：[" + str(len(exist_song_id_1_in_2)) + "]")
         __remove_song(id1, exist_song_id_1_in_2)
     print('')
