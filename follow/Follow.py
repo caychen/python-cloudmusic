@@ -1,3 +1,5 @@
+import time
+
 from common.Constant import headers, limit, profiles, csrf, get_session
 from encrypt.Encrypt import encrypted_request
 
@@ -30,6 +32,10 @@ def __get_none_follow(response):
                     offset += limit
                 else:
                     break
+
+                print("休息休息5s...")
+                time.sleep(5000)
+
             print("不在关注列表中的：", none_follows_nickname)
 
         except Exception as reason:

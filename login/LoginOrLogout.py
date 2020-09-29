@@ -1,13 +1,15 @@
 import hashlib
-import json
+import time
 
 from configparser import ConfigParser
 
 # pip install requests
 import requests
 
-from common.Constant import headers, set_session, set_csrf, phone_login_url, csrf, get_session, logout_url
+from common.Constant import headers, set_session, set_csrf, phone_login_url, csrf, get_session, logout_url, get_unsafe_proxy_ip
 from encrypt.Encrypt import encrypted_request
+
+requests.packages.urllib3.disable_warnings()
 
 
 def __read_ini(ini_file_name, item):
@@ -34,7 +36,12 @@ def phone_login():
         # 设置session
         session = requests.session()
         set_session(session)
-        response = session.post(phone_login_url, headers=headers, data=data)
+
+        proxies = get_unsafe_proxy_ip()
+
+        session.trust_env = False
+
+        response = session.post(phone_login_url, headers=headers, data=data, verify=False, proxies=proxies, timeout=10000)
         response.encoding = 'utf-8'
 
         # 获取cookie和csrf并设置
@@ -42,9 +49,13 @@ def phone_login():
         csrf = cookies.get('__csrf')
         if csrf is None:
             print(response.text)
-            res = json.loads(response.text)
-            exit(res['code'])
+            # res = json.loads(response.text)
+            exit(-1)
+
         set_csrf(csrf)
+
+        print("休息休息5s...")
+        time.sleep(5000)
 
     except Exception as reason:
         print(reason)

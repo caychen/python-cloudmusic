@@ -1,8 +1,10 @@
-import json
+import time
+
+import requests
 
 from common.Constant import csrf, get_session, headers, playlist_url, public_playlist_code, private_playlist_code, \
     playlist_detail_url, get_csrf, song_detail_url, \
-    remove_song_url, playsheet_detail_url
+    add_and_remove_song_url_from_sheet, playsheet_detail_url, search_songs_url
 from encrypt.Encrypt import encrypted_request
 from entity.Song import Song
 from entity.SongSheet import SongSheet
@@ -45,7 +47,7 @@ def __remove_down_songs(playsheet_id, have_down_song_ids):
             print(Song(r.get('id'), r.get('name')))
 
         # 删除
-        __remove_song(playsheet_id, have_down_song_ids)
+        __remove_songs(playsheet_id, have_down_song_ids)
         print('')
 
 
@@ -57,7 +59,7 @@ def __remove_trial_songs(playsheet_id, only_trial_song_ids):
             print(Song(r.get('id'), r.get('name')))
 
         # 删除
-        __remove_song(playsheet_id, only_trial_song_ids)
+        __remove_songs(playsheet_id, only_trial_song_ids)
         print('')
 
 
@@ -85,6 +87,9 @@ def __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids):
                 have_down_song_ids.append(d.get("id"))
             if d.get("code") == -110:  # -110表示歌曲只能试听
                 only_trial_song_ids.append(d.get("id"))
+
+        print("休息休息5s...")
+        time.sleep(5000)
 
 
 def __get_playlist(response):
@@ -131,6 +136,9 @@ def __get_playlist(response):
             else:
                 break
 
+            print("休息休息5s...")
+            time.sleep(5000)
+
         except Exception as reason:
             print(reason)
 
@@ -164,6 +172,9 @@ def __get_list(playlist_sheets):
             track_ids = r.get('playlist').get('trackIds')
             song_ids.extend(track_id.get('id') for track_id in track_ids)
 
+            print("休息休息5s...")
+            time.sleep(5000)
+
         return song_ids
     except Exception as reason:
         print('__get_list方法捕获异常：', reason)
@@ -185,6 +196,7 @@ def __get_single_song_detail(response):
     print(r)
 
 
+# 跳转到歌曲页面：https://music.163.com/#/song?id=
 def __get_songs_detail(song_ids):
     if len(song_ids) == 0:
         return dict(songs=[])
@@ -197,13 +209,50 @@ def __get_songs_detail(song_ids):
         response = get_session().post(song_detail_url, data=data, headers=headers)
         response.encoding = 'UTF-8'
         r = response.json()
+
+        print("休息休息5s...")
+        time.sleep(5000)
+
         return r
     except Exception as reason:
         print('__get_songs_detail方法捕获异常：', reason)
         raise Exception
 
 
-def __remove_song(song_sheet_id, song_ids):
+'''
+song_sheet_id: 歌单id
+song_ids: 需要添加的歌曲id集合
+'''
+def __add_songs(song_sheet_id, song_ids):
+    req_text = {
+        'pid': song_sheet_id,
+        'trackIds': song_ids,
+        'op': 'add'
+    }
+
+    data = encrypted_request(req_text)
+    try:
+        response = get_session().post(add_and_remove_song_url_from_sheet, data=data, headers=headers)
+        response.encoding = 'utf-8'
+        r = response.json()
+
+        print("休息休息5s...")
+        time.sleep(5000)
+
+        if r.get('code') == 200:
+            return
+        else:
+            print()
+    except Exception as reason:
+        print('__add_songs方法捕获异常：', reason)
+        raise Exception
+
+
+'''
+song_sheet_id: 歌单id
+song_ids: 需要删除的歌曲id
+'''
+def __remove_songs(song_sheet_id, song_ids):
     req_text = {
         'pid': song_sheet_id,
         'trackIds': song_ids,
@@ -212,15 +261,19 @@ def __remove_song(song_sheet_id, song_ids):
 
     data = encrypted_request(req_text)
     try:
-        response = get_session().post(remove_song_url, data=data, headers=headers)
+        response = get_session().post(add_and_remove_song_url_from_sheet, data=data, headers=headers)
         response.encoding = 'utf-8'
         r = response.json()
+
+        print("休息休息5s...")
+        time.sleep(5000)
+
         if r.get('code') == 200:
             return
         else:
             print()
     except Exception as reason:
-        print('__remove_song方法捕获异常：', reason)
+        print('__remove_songs方法捕获异常：', reason)
         raise Exception
 
 
@@ -260,7 +313,7 @@ def __remove_duplicate_song(response):
             # 进行删除
             if len(private_exist_song_ids) != 0:
                 print("即将从[" + str(private_playlist_sheet.id) + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
-                __remove_song(private_playlist_sheet.id, private_exist_song_ids)
+                __remove_songs(private_playlist_sheet.id, private_exist_song_ids)
 
             # 清空
             private_exist_song_ids.clear()
@@ -283,9 +336,10 @@ def __foreach_remove_duplicate_song(response):
             for j in range(len(private_playlist_sheets)):
                 if i != j:
                     __remove_each(private_playlist_sheets[i].id, private_playlist_sheets[j].id)
+                    time.sleep(3)
 
     except Exception as reason:
-        print('__each_remove_duplicate_song方法捕获异常：', reason)
+        print('__foreach_remove_duplicate_song方法捕获异常：', reason)
         raise Exception
 
 
@@ -332,5 +386,39 @@ def __remove_each(id1, id2):
     # 进行删除
     if len(exist_song_id_1_in_2) != 0:
         print("即将从[" + str(id1) + "]歌单中删除，数量：[" + str(len(exist_song_id_1_in_2)) + "]")
-        __remove_song(id1, exist_song_id_1_in_2)
+        __remove_songs(id1, exist_song_id_1_in_2)
     print('')
+
+
+# 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002) *(type)*
+def __collect_song_to_self_by_keyword(response):
+    keyword = input("输入要查询的关键字： ").strip()
+    req_text = {
+        's': keyword,
+        'type': '1000',
+        'offset': 10,
+        'total': 'true',
+        'limit': 20
+    }
+
+    data = encrypted_request(req_text)
+    try:
+        response = requests.post(search_songs_url, data=data, headers=headers)
+        response.encoding = 'utf-8'
+        r = response.json()
+
+        print("休息休息5s...")
+        time.sleep(5000)
+        
+        if r.get('code') == 200:
+            return
+        else:
+            print(response.text)
+
+    except Exception as reason:
+        print('__collect_song_to_self_by_keyword方法捕获异常：', reason)
+        raise Exception
+
+
+def __collect_song_to_self_by_input(response):
+    return
