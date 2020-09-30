@@ -89,7 +89,7 @@ def __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids):
                 only_trial_song_ids.append(d.get("id"))
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
 
 
 def __get_playlist(response):
@@ -137,7 +137,7 @@ def __get_playlist(response):
                 break
 
             print("休息休息5s...")
-            time.sleep(5000)
+            time.sleep(5)
 
         except Exception as reason:
             print(reason)
@@ -173,7 +173,7 @@ def __get_list(playlist_sheets):
             song_ids.extend(track_id.get('id') for track_id in track_ids)
 
             print("休息休息5s...")
-            time.sleep(5000)
+            time.sleep(5)
 
         return song_ids
     except Exception as reason:
@@ -211,7 +211,7 @@ def __get_songs_detail(song_ids):
         r = response.json()
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
 
         return r
     except Exception as reason:
@@ -237,7 +237,7 @@ def __add_songs(song_sheet_id, song_ids):
         r = response.json()
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
 
         if r.get('code') == 200:
             return
@@ -266,7 +266,7 @@ def __remove_songs(song_sheet_id, song_ids):
         r = response.json()
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
 
         if r.get('code') == 200:
             return
@@ -408,7 +408,7 @@ def __collect_song_to_self_by_keyword(response):
         r = response.json()
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
         
         if r.get('code') == 200:
             return

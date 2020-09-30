@@ -34,7 +34,7 @@ def __get_none_follow(response):
                     break
 
                 print("休息休息5s...")
-                time.sleep(5000)
+                time.sleep(5)
 
             print("不在关注列表中的：", none_follows_nickname)
 

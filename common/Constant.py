@@ -6,6 +6,8 @@ MODULUS = ('00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7'
 NONCE = b'0CoJUm6Qyw8W8jud'
 PUBKEY = '010001'
 
+CHECK_TOKEN = '9ca17ae2e6ffcda170e2e6eebac17a8ebff8d0dc5bbbe78bb2d45f968a8fabb547a295b8d9f662bbabfeacbc2af0feaec3b92ae98c8e99b17fe9f086d1e75b939f8bb6d14f8eea8687ca6686908e90c6728ceaee9e'
+
 # 获取关注的每页数量
 limit = 20
 
@@ -41,6 +43,7 @@ search_songs_url = "http://music.163.com/weapi/cloudsearch/get/web?csrf_token="
 # 请求头
 headers = {
     'Host': 'music.163.com',
+    'Connection': 'close',
     # 'Cookie' : 'appver=2.7.1;',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
 }

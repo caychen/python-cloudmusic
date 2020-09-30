@@ -6,7 +6,8 @@ from configparser import ConfigParser
 # pip install requests
 import requests
 
-from common.Constant import headers, set_session, set_csrf, phone_login_url, csrf, get_session, logout_url, get_unsafe_proxy_ip
+from common.Constant import headers, set_session, set_csrf, phone_login_url, csrf, get_session, logout_url, \
+    get_unsafe_proxy_ip, CHECK_TOKEN
 from encrypt.Encrypt import encrypted_request
 
 requests.packages.urllib3.disable_warnings()
@@ -27,7 +28,8 @@ def phone_login():
     text = {
         'phone': phone,
         'password': hashlib.md5(password.encode()).hexdigest(),
-        'rememberLogin': 'true'
+        'rememberLogin': 'true',
+        'checkToken': CHECK_TOKEN
     }
 
     data = encrypted_request(text)
@@ -55,7 +57,7 @@ def phone_login():
         set_csrf(csrf)
 
         print("休息休息5s...")
-        time.sleep(5000)
+        time.sleep(5)
 
     except Exception as reason:
         print(reason)

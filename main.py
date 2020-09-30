@@ -53,11 +53,11 @@ if __name__ == '__main__':
     proxy_ip = random.choice(proxies_ips)
     print('本次使用的代理为: ' + proxy_ip)
     proxies = {
-        # 'http': proxy_ip,
-        'https': proxy_ip,
+        # 'http': "http://" + proxy_ip,
+        'https': "https://" + proxy_ip,
     }
 
-    set_unsafe_proxy_ip(proxies)
+    # set_unsafe_proxy_ip(proxies)
 
     #
     response = None
