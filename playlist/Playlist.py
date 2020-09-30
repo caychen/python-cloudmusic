@@ -300,23 +300,24 @@ def __remove_duplicate_song(response):
             private_song_ids.clear()
 
             songs_detail = __get_songs_detail(private_exist_song_ids).get('songs')
-            exist_song_names = []
-            for song_detail in songs_detail:
-                exist_song_names.append(song_detail.get('name'))
+            if songs_detail is not None:
+                exist_song_names = []
+                for song_detail in songs_detail:
+                    exist_song_names.append(song_detail.get('name'))
 
-            if len(exist_song_names) != 0:
-                print('私有歌单[' + private_playlist_sheet.name + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
-            else:
-                print('私有歌单[' + private_playlist_sheet.name + ']无有重复歌曲')
-            print('')
+                if len(exist_song_names) != 0:
+                    print('私有歌单[' + private_playlist_sheet.name + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
+                else:
+                    print('私有歌单[' + private_playlist_sheet.name + ']无有重复歌曲')
 
-            # 进行删除
-            if len(private_exist_song_ids) != 0:
-                print("即将从[" + str(private_playlist_sheet.id) + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
-                __remove_songs(private_playlist_sheet.id, private_exist_song_ids)
+                # 进行删除
+                if len(private_exist_song_ids) != 0:
+                    print("即将从[" + str(private_playlist_sheet.id) + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
+                    __remove_songs(private_playlist_sheet.id, private_exist_song_ids)
 
-            # 清空
-            private_exist_song_ids.clear()
+                # 清空
+                private_exist_song_ids.clear()
+                print('')
 
     except Exception as reason:
         print('__remove_duplicate_song方法捕获异常：', reason)
@@ -336,7 +337,7 @@ def __foreach_remove_duplicate_song(response):
             for j in range(len(private_playlist_sheets)):
                 if i != j:
                     __remove_each(private_playlist_sheets[i].id, private_playlist_sheets[j].id)
-                    time.sleep(3)
+                    time.sleep(5)
 
     except Exception as reason:
         print('__foreach_remove_duplicate_song方法捕获异常：', reason)
@@ -375,14 +376,16 @@ def __remove_each(id1, id2):
 
     if len(exist_song_id_1_in_2) != 0:
         songs_detail = __get_songs_detail(exist_song_id_1_in_2).get('songs')
-        exist_song_names = []
-        for song_detail in songs_detail:
-            exist_song_names.append(song_detail.get('name'))
+        if songs_detail is not None:
+            exist_song_names = []
+            for song_detail in songs_detail:
+                exist_song_names.append(song_detail.get('name'))
 
-        if len(exist_song_names) != 0:
-            print('私有歌单[' + str(id1) + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
-        else:
-            print('私有歌单[' + str(id1) + ']无有重复歌曲')
+            if len(exist_song_names) != 0:
+                print('私有歌单[' + str(id1) + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
+            else:
+                print('私有歌单[' + str(id1) + ']无有重复歌曲')
+
     # 进行删除
     if len(exist_song_id_1_in_2) != 0:
         print("即将从[" + str(id1) + "]歌单中删除，数量：[" + str(len(exist_song_id_1_in_2)) + "]")
