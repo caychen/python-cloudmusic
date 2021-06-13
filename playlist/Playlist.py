@@ -14,6 +14,7 @@ private_playlist_sheets = []
 public_playlist_sheets = []
 private_playlist_sheet_ids = []
 public_playlist_sheet_ids = []
+global_playlist_sheet_dict = dict()
 
 
 def __remove_single_playsheet_down_trial_songs(response):
@@ -42,7 +43,7 @@ def __del_songs_where_down_trial(sheet_id):
 def __remove_down_songs(playsheet_id, have_down_song_ids):
     if len(have_down_song_ids) != 0:
         have_down_song_result = __get_songs_detail(have_down_song_ids).get("songs")
-        print("下架歌曲, 即将从[" + str(playsheet_id) + "]歌单中删除，数量：[" + str(len(have_down_song_result)) + "]")
+        print("下架歌曲, 即将从[" + global_playlist_sheet_dict[playsheet_id] + "]歌单中删除，数量：[" + str(len(have_down_song_result)) + "]")
         for r in have_down_song_result:
             print(Song(r.get('id'), r.get('name')))
 
@@ -54,7 +55,7 @@ def __remove_down_songs(playsheet_id, have_down_song_ids):
 def __remove_trial_songs(playsheet_id, only_trial_song_ids):
     if len(only_trial_song_ids) != 0:
         only_trial_song_result = __get_songs_detail(only_trial_song_ids).get("songs")
-        print("试听歌曲, 即将从[" + str(playsheet_id) + "]歌单中删除，数量：[" + str(len(only_trial_song_result)) + "]")
+        print("试听歌曲, 即将从[" + global_playlist_sheet_dict[playsheet_id] + "]歌单中删除，数量：[" + str(len(only_trial_song_result)) + "]")
         for r in only_trial_song_result:
             print(Song(r.get('id'), r.get('name')))
 
@@ -120,6 +121,8 @@ def __get_playlist(response):
                     song_sheet = SongSheet(s['id'], s['name'], s['privacy'])
                     song_list.add(song_sheet)
 
+                    global_playlist_sheet_dict.update({s['id']:s['name']})
+
                     if s['privacy'] == private_playlist_code:
                         private_playlist_sheets.append(song_sheet)
                         private_playlist_sheet_ids.append(s['id'])
@@ -144,6 +147,8 @@ def __get_playlist(response):
 
     for song_sheet in song_list:
         print(song_sheet)
+
+    print(global_playlist_sheet_dict)
     print('')
 
 
@@ -303,7 +308,7 @@ def __remove_duplicate_song(response):
             if songs_detail is not None:
                 exist_song_names = []
                 for song_detail in songs_detail:
-                    exist_song_names.append(song_detail.get('name'))
+                    exist_song_names.append('' if song_detail.get('name') is None else song_detail.get('name'))
 
                 if len(exist_song_names) != 0:
                     print('私有歌单[' + private_playlist_sheet.name + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
@@ -312,7 +317,7 @@ def __remove_duplicate_song(response):
 
                 # 进行删除
                 if len(private_exist_song_ids) != 0:
-                    print("即将从[" + str(private_playlist_sheet.id) + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
+                    print("即将从[" + global_playlist_sheet_dict[private_playlist_sheet.id] + "]歌单中删除，数量：[" + str(len(private_exist_song_ids)) + "]")
                     __remove_songs(private_playlist_sheet.id, private_exist_song_ids)
 
                 # 清空
@@ -379,16 +384,16 @@ def __remove_each(id1, id2):
         if songs_detail is not None:
             exist_song_names = []
             for song_detail in songs_detail:
-                exist_song_names.append(song_detail.get('name'))
+                exist_song_names.append('' if song_detail.get('name') is None else song_detail.get('name'))
 
             if len(exist_song_names) != 0:
-                print('私有歌单[' + str(id1) + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
+                print('私有歌单[' + global_playlist_sheet_dict[id1] + ']有重复歌曲：[' + '，'.join(exist_song_names) + ']')
             else:
-                print('私有歌单[' + str(id1) + ']无有重复歌曲')
+                print('私有歌单[' + global_playlist_sheet_dict[id1] + ']无有重复歌曲')
 
     # 进行删除
     if len(exist_song_id_1_in_2) != 0:
-        print("即将从[" + str(id1) + "]歌单中删除，数量：[" + str(len(exist_song_id_1_in_2)) + "]")
+        print("即将从[" + global_playlist_sheet_dict[id1] + "]歌单中删除，数量：[" + str(len(exist_song_id_1_in_2)) + "]")
         __remove_songs(id1, exist_song_id_1_in_2)
     print('')
 
