@@ -23,7 +23,8 @@ def phone_login():
     text = {
         'phone': phone,
         'password': hashlib.md5(password.encode()).hexdigest(),
-        'rememberLogin': 'true'
+        'rememberLogin': 'true',
+        'countrycode': '86'
     }
 
     data = encrypted_request(text)
@@ -37,6 +38,18 @@ def phone_login():
     # 获取cookie和csrf并设置
     cookies = dict(response.cookies)
     csrf = cookies.get('__csrf')
+    if csrf is None:
+        print(response.text)
+        # res = json.loads(response.text)
+        exit(-1)
+
     set_csrf(csrf)
+
+    _h = headers['Cookie']
+    for (k, v) in cookies.items():
+        _h = _h + " " + k + "=" + v + ";"
+
+    headers['Cookie'] = _h
+    print('登录成功')
 
     return response

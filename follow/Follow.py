@@ -1,13 +1,19 @@
 import time
 
-from common.Constant import headers, limit, profiles, csrf, get_session
+from common.Constant import headers, limit, profiles, csrf, get_session, get_csrf
 from encrypt.Encrypt import encrypted_request
 
 
 def __get_follows(user_id, offset):
-    url = 'https://music.163.com/weapi/user/getfollows/{0}?csrf_token={1}'.format(user_id, csrf)
-    headers['Referer'] = 'http://music.163.com/user/follows?id={0}'.format(user_id)
-    req = {'offset': offset, 'limit': limit, 'csrf_token': csrf}
+    url = 'https://music.163.com/weapi/user/getfolloweds?csrf_token={0}'.format(csrf)
+    # headers['Referer'] = 'http://music.163.com/user/fans?id={0}'.format(user_id)
+    req = {
+        'offset': offset,
+        'limit': limit,
+        'csrf_token': get_csrf(),
+        'userId': user_id,
+        'total': "true"
+    }
     response = get_session().post(url, data=encrypted_request(req), headers=headers)
     response.encoding = 'utf-8'
     return response.json()
@@ -25,7 +31,7 @@ def __get_none_follow(response):
             offset = 0
             while True:
                 response = __get_follows(user_id, offset)
-                follows = response.get('follow')
+                follows = response.get('followeds')
                 none_follows_nickname.extend(each for each in __parser(follows))
                 more = response.get('more')
                 if more:

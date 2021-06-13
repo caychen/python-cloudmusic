@@ -14,7 +14,8 @@ import random
 from common.Constant import set_unsafe_proxy_ip
 from common.MyProxy import proxies_ips
 from follow.Follow import __get_none_follow
-from login.LoginOrLogout import phone_login, __logout
+from login.Login import phone_login
+from login.LoginOrLogout import __logout
 from playlist.Playlist import __get_playlist, \
     __remove_duplicate_song, \
     __each_remove_duplicate_song, \

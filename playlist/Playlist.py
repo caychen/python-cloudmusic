@@ -2,7 +2,7 @@ import time
 
 import requests
 
-from common.Constant import csrf, get_session, headers, playlist_url, public_playlist_code, private_playlist_code, \
+from common.Constant import csrf, get_session, headers, personal_playlist_url, public_playlist_code, private_playlist_code, \
     playlist_detail_url, get_csrf, song_detail_url, \
     add_and_remove_song_url_from_sheet, playsheet_detail_url, search_songs_url
 from encrypt.Encrypt import encrypted_request
@@ -27,7 +27,7 @@ def __remove_single_playsheet_down_trial_songs(response):
 
 def __del_songs_where_down_trial(sheet_id):
     play_sheet_id = [sheet_id]
-    song_ids = __get_list(play_sheet_id)
+    song_ids = __get_song_list(play_sheet_id)
     have_down_song_ids = []  # 下架歌曲
     only_trial_song_ids = []  # 试听歌曲
     __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids)
@@ -108,7 +108,7 @@ def __get_playlist(response):
 
         data = encrypted_request(text)
         try:
-            response = get_session().post(playlist_url + get_csrf(), data=data, headers=headers)
+            response = get_session().post(personal_playlist_url + get_csrf(), data=data, headers=headers)
             response.encoding = 'utf-8'
             r = response.json()
 
@@ -147,14 +147,14 @@ def __get_playlist(response):
     print('')
 
 
-def __get_list(playlist_sheets):
+def __get_song_list(playlist_sheets):
     req_text = {
         "id": '',
-        "offset": 1000,
-        "total": True,
-        "limit": 1000,
+        "offset": 0,
+        "total": "true",
+        "limit": 10000,
         "n": 1000,
-        "csrf_token": csrf
+        "csrf_token": get_csrf()
     }
 
     song_ids = []
@@ -284,12 +284,12 @@ def __remove_duplicate_song(response):
             __get_playlist(response)
 
         # 获取所有已整理的歌曲id（只需执行一次）
-        public_song_ids = __get_list(public_playlist_sheet_ids)
+        public_song_ids = __get_song_list(public_playlist_sheet_ids)
 
         # 遍历未整理的歌单id
         for private_playlist_sheet in private_playlist_sheets:
             # 获取指定私有歌单中的歌曲id
-            private_song_ids = __get_list([private_playlist_sheet.id])
+            private_song_ids = __get_song_list([private_playlist_sheet.id])
 
             # 遍历私有歌单中的歌曲id
             for private_song_id in private_song_ids:
@@ -367,8 +367,8 @@ def __each_remove_duplicate_song(response):
 def __remove_each(id1, id2):
     print('当前id1：' + str(id1) + ', id2:' + str(id2))
     exist_song_id_1_in_2 = []
-    song_ids1 = __get_list([id1])
-    song_ids2 = __get_list([id2])
+    song_ids1 = __get_song_list([id1])
+    song_ids2 = __get_song_list([id2])
 
     for song_id in song_ids1:
         if song_id in song_ids2:
