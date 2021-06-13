@@ -29,8 +29,8 @@ from task.Task import __daily_sign, __do_refresh_song_task
 
 "参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
 
-Menus = ['关注人列表',
-         '获取歌单',
+Menus = ['获取歌单',
+         '关注人列表',
          '排除未整理的重复歌曲',
          '相互排除未整理的重复歌曲',
          '循环删除未整理的重复歌曲（自动）',
@@ -85,8 +85,8 @@ if __name__ == '__main__':
 
             elif index in list(range(1, len(Menus) + 1)):
                 {
-                    1: __get_none_follow,  # __get_none_follow,
-                    2: __get_playlist,  # __get_playlist
+                    1: __get_playlist,  # __get_playlist
+                    2: __get_none_follow,  # __get_none_follow,
                     3: __remove_duplicate_song,  # __remove_duplicate_song
                     4: __each_remove_duplicate_song,
                     5: __foreach_remove_duplicate_song,
