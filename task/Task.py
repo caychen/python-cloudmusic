@@ -1,7 +1,7 @@
 import json
 import random
 
-from common.Constant import headers, get_session, daily_sign_url, refresh_song_url, get_csrf, recommend_song_url, \
+from common.Constant import headers, get_session, daily_sign_url, get_csrf, recommend_song_url, \
     feedback_song_url, playlist_detail_url
 from encrypt.Encrypt import encrypted_request
 
