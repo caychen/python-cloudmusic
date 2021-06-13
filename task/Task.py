@@ -1,7 +1,8 @@
 import json
 import random
 
-from common.Constant import headers, get_session, daily_sign_url, refresh_song_url, get_csrf, recommend_song_url
+from common.Constant import headers, get_session, daily_sign_url, refresh_song_url, get_csrf, recommend_song_url, \
+    feedback_song_url, playlist_detail_url
 from encrypt.Encrypt import encrypted_request
 
 
@@ -25,7 +26,7 @@ def __daily_sign(response):
 def __do_refresh_song_task(response):
     __csrf = get_csrf()
 
-    url = refresh_song_url + __csrf
+
     req = {
         'csrf_token': __csrf
     }
@@ -36,9 +37,9 @@ def __do_refresh_song_task(response):
         print("获取推荐歌曲失败 " + str(ret['code']) + "：" + ret['message'])
     else:
         lists = ret['recommend']
-        musicLists = [(d['id']) for d in lists]
+        music_lists = [(d['id']) for d in lists]
 
-    musicId = []
+    music_id = []
 
     req = {
         'id': None,
@@ -46,16 +47,18 @@ def __do_refresh_song_task(response):
         'csrf_token': __csrf
     }
 
-    for m in musicLists:
+    # 歌单详情
+    url = playlist_detail_url + __csrf
+    for m in music_lists:
         req['id'] = m
         data = encrypted_request(req)
         res = get_session().post(url=url, data=data, headers=headers)
         ret = json.loads(res.text)
 
         for i in ret['playlist']['trackIds']:
-            musicId.append(i['id'])
+            music_id.append(i['id'])
 
-    # print("歌单大小：{musicCount}首\n".format(musicCount=len(musicId)))
+    # print("歌单大小：{musicCount}首\n".format(musicCount=len(music_id)))
     m = map(
         lambda x: {
             'action': 'play',
@@ -69,13 +72,14 @@ def __do_refresh_song_task(response):
                 'wifi': 0
             }
         },
-        random.sample(musicId, 420 if len(musicId) > 420 else len(musicId)))
-    postData = {
+        random.sample(music_id, 420 if len(music_id) > 420 else len(music_id)))
+
+    req_text = {
         'logs': json.dumps(list(m))
     }
 
-    data = encrypted_request(postData)
-    res = get_session().post(url="http://music.163.com/weapi/feedback/weblog", data=data)
+    data = encrypted_request(req_text)
+    res = get_session().post(url=feedback_song_url, data=data)
     ret = json.loads(res.text)
 
     if ret['code'] == 200:

@@ -27,14 +27,17 @@ playsheet_detail_url = "http://music.163.com/weapi/song/enhance/player/url?csrf_
 # 每日签到url
 daily_sign_url = "https://music.163.com/weapi/point/dailyTask"
 
-# 刷歌url
-refresh_song_url = "https://music.163.com/weapi/v6/playlist/detail?csrf_token="
-
 # 推荐歌曲
 recommend_song_url = "https://music.163.com/weapi/v1/discovery/recommend/resource"
 
 # 等级url
 personal_level_url = "https://music.163.com/weapi/user/level?csrf_token="
+
+# 刷歌url
+feedback_song_url = "http://music.163.com/weapi/feedback/weblog"
+
+# 粉丝url
+get_followed_list = 'https://music.163.com/weapi/user/getfolloweds?csrf_token='
 
 '''
 歌曲搜索url, 如果加上type参数，则表示根据类型查询，其中：

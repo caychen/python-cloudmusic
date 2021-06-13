@@ -1,12 +1,11 @@
 import time
 
-from common.Constant import headers, limit, profiles, csrf, get_session, get_csrf
+from common.Constant import headers, limit, profiles, csrf, get_session, get_csrf, get_followed_list
 from encrypt.Encrypt import encrypted_request
 
 
 def __get_follows(user_id, offset):
-    url = 'https://music.163.com/weapi/user/getfolloweds?csrf_token={0}'.format(csrf)
-    # headers['Referer'] = 'http://music.163.com/user/fans?id={0}'.format(user_id)
+    url = get_followed_list + get_csrf()
     req = {
         'offset': offset,
         'limit': limit,
