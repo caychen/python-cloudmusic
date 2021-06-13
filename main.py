@@ -25,6 +25,7 @@ from playlist.Playlist import __get_playlist, \
     __remove_down_trial_song_from_all_private, \
     __collect_song_to_self_by_keyword, \
     __collect_song_to_self_by_input
+from task.Task import __daily_sign, __do_refresh_song_task
 
 "参考：https://github.com/darknessomi/musicbox/blob/master/NEMbox/api.py"
 
@@ -36,8 +37,10 @@ Menus = ['关注人列表',
          '获取歌曲信息',
          '删除某个歌单中的下架歌曲和试听歌曲（需要输入歌单）',
          '删除所有私有歌单中的下架歌曲和试听歌曲',
-         '歌曲收藏（自动根据搜索词查询）',
-         '歌曲收藏（手动输入歌单号）',
+         '歌曲收藏（自动根据搜索词查询）(待实现)',
+         '歌曲收藏（手动输入歌单号）（待实现）',
+         '每日签到',
+         '刷歌任务',
          '退出']
 
 
@@ -93,7 +96,9 @@ if __name__ == '__main__':
                     8: __remove_down_trial_song_from_all_private,
                     9: __collect_song_to_self_by_keyword,
                     10: __collect_song_to_self_by_input,
-                    11: __logout,
+                    11: __daily_sign,
+                    12: __do_refresh_song_task,
+                    13: __logout,
                 }[index](response)
             print()
 

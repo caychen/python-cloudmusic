@@ -24,6 +24,18 @@ logout_url = 'https://music.163.com/weapi/logout?csrf_token='
 # 获取歌曲URL
 playsheet_detail_url = "http://music.163.com/weapi/song/enhance/player/url?csrf_token="
 
+# 每日签到url
+daily_sign_url = "https://music.163.com/weapi/point/dailyTask"
+
+# 刷歌url
+refresh_song_url = "https://music.163.com/weapi/v6/playlist/detail?csrf_token="
+
+# 推荐歌曲
+recommend_song_url = "https://music.163.com/weapi/v1/discovery/recommend/resource"
+
+# 等级url
+personal_level_url = "https://music.163.com/weapi/user/level?csrf_token="
+
 '''
 歌曲搜索url, 如果加上type参数，则表示根据类型查询，其中：
 type=1：单曲
