@@ -7,12 +7,15 @@ from encrypt.Encrypt import encrypted_request
 
 
 def __daily_sign(response):
+    __csrf = get_csrf()
+
     req = {
-        'type': 0
+        'type': 1,
+        'csrf_token': __csrf
     }
 
     data = encrypted_request(req)
-    res = get_session().post(url=daily_sign_url, data=data, headers=headers)
+    res = get_session().post(url=daily_sign_url + __csrf, data=data, headers=headers)
     ret = json.loads(res.text)
 
     if ret['code'] == 200:
@@ -25,7 +28,6 @@ def __daily_sign(response):
 
 def __do_refresh_song_task(response):
     __csrf = get_csrf()
-
 
     req = {
         'csrf_token': __csrf

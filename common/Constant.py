@@ -25,7 +25,7 @@ logout_url = 'https://music.163.com/weapi/logout?csrf_token='
 playsheet_detail_url = "http://music.163.com/weapi/song/enhance/player/url?csrf_token="
 
 # 每日签到url
-daily_sign_url = "https://music.163.com/weapi/point/dailyTask"
+daily_sign_url = "https://music.163.com/weapi/point/dailyTask?csrf_token="
 
 # 推荐歌曲
 recommend_song_url = "https://music.163.com/weapi/v1/discovery/recommend/resource"
