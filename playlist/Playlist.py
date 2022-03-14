@@ -1,10 +1,11 @@
 import time
-
+import datetime
 import requests
 
-from common.Constant import csrf, get_session, headers, personal_playlist_url, public_playlist_code, private_playlist_code, \
+from common.Constant import csrf, get_session, headers, cookies, personal_playlist_url, public_playlist_code, \
+    private_playlist_code, \
     playlist_detail_url, get_csrf, song_detail_url, \
-    add_and_remove_song_url_from_sheet, playsheet_detail_url, search_songs_url
+    add_and_remove_song_url_from_sheet, playsheet_detail_url, search_songs_url, get_cookies
 from encrypt.Encrypt import encrypted_request
 from entity.Song import Song
 from entity.SongSheet import SongSheet
@@ -15,6 +16,12 @@ public_playlist_sheets = []
 private_playlist_sheet_ids = []
 public_playlist_sheet_ids = []
 global_playlist_sheet_dict = dict()
+
+
+def __print_time(sleep_seconds = 10):
+    d = datetime.datetime.now()
+    print("休息休息, 当前时间为：" + d.strftime('%H:%M:%S'))
+    time.sleep(sleep_seconds)
 
 
 def __remove_single_playsheet_down_trial_songs(response):
@@ -89,8 +96,8 @@ def __get_down_trial_songs(have_down_song_ids, only_trial_song_ids, song_ids):
             if d.get("code") == -110:  # -110表示歌曲只能试听
                 only_trial_song_ids.append(d.get("id"))
 
-        print("休息休息5s...")
-        time.sleep(5)
+        __print_time()
+        
 
 
 def __get_playlist(response):
@@ -103,12 +110,17 @@ def __get_playlist(response):
         text = {
             "offset": offset,
             "uid": user_id,
-            "limit": 100,
+            "limit": 1001,
             "csrf_token": get_csrf()
         }
 
         data = encrypted_request(text)
         try:
+            cook = ''
+            c = get_cookies()
+            for k in c:
+                cook = cook + (k + "=" + c[k] + "; ")
+            headers['Cookie'] = cook
             response = get_session().post(personal_playlist_url + get_csrf(), data=data, headers=headers)
             response.encoding = 'utf-8'
             r = response.json()
@@ -134,22 +146,18 @@ def __get_playlist(response):
                 else:
                     break
 
-            if r.get("more"):
+            if r.get("more", False):
                 offset += 100
             else:
                 break
 
-            print("休息休息5s...")
-            time.sleep(5)
+            __print_time()
 
         except Exception as reason:
             print(reason)
 
     for song_sheet in song_list:
         print(song_sheet)
-
-    print(global_playlist_sheet_dict)
-    print('')
 
 
 def __get_song_list(playlist_sheets):
@@ -177,8 +185,7 @@ def __get_song_list(playlist_sheets):
             track_ids = r.get('playlist').get('trackIds')
             song_ids.extend(track_id.get('id') for track_id in track_ids)
 
-            print("休息休息5s...")
-            time.sleep(5)
+            __print_time()
 
         return song_ids
     except Exception as reason:
@@ -215,8 +222,7 @@ def __get_songs_detail(song_ids):
         response.encoding = 'UTF-8'
         r = response.json()
 
-        print("休息休息5s...")
-        time.sleep(5)
+        __print_time()
 
         return r
     except Exception as reason:
@@ -241,8 +247,7 @@ def __add_songs(song_sheet_id, song_ids):
         response.encoding = 'utf-8'
         r = response.json()
 
-        print("休息休息5s...")
-        time.sleep(5)
+        __print_time()
 
         if r.get('code') == 200:
             return
@@ -270,8 +275,7 @@ def __remove_songs(song_sheet_id, song_ids):
         response.encoding = 'utf-8'
         r = response.json()
 
-        print("休息休息5s...")
-        time.sleep(5)
+        __print_time()
 
         if r.get('code') == 200:
             return
@@ -415,8 +419,7 @@ def __collect_song_to_self_by_keyword(response):
         response.encoding = 'utf-8'
         r = response.json()
 
-        print("休息休息5s...")
-        time.sleep(5)
+        __print_time()
         
         if r.get('code') == 200:
             return

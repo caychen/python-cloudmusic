@@ -10,7 +10,7 @@ limit = 20
 # 个人主页
 profiles = 'https://music.163.com/#/user/home?id='
 # 手机号登录请求的url
-phone_login_url = 'https://music.163.com/weapi/login/cellphone'
+phone_login_url = 'https://music.163.com/weapi/w/login/cellphone'
 # 个人歌单url
 personal_playlist_url = 'https://music.163.com/weapi/user/playlist?csrf_token='
 # 歌单详情url
@@ -52,9 +52,11 @@ search_songs_url = "http://music.163.com/weapi/cloudsearch/get/web?csrf_token="
 
 # 请求头
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36",
-    "Referer": "http://music.163.com/",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
+    "Referer": "https://music.163.com/",
     "Accept-Encoding": "gzip, deflate",
+    'Origin': 'https://music.163.com',
+    'Host': 'music.163.com',
     "Cookie": "os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; channel=netease;"
 }
 
@@ -62,6 +64,7 @@ public_playlist_code = 0
 private_playlist_code = 10
 
 session = None
+cookies = None
 csrf = None
 unsafe_proxy_ip = None
 safe_proxy_ip = None
@@ -79,6 +82,15 @@ def get_session():
 def set_csrf(c):
     global csrf
     csrf = c
+
+
+def set_cookies(c):
+    global cookies
+    cookies = c
+
+
+def get_cookies():
+    return cookies
 
 
 def get_csrf():

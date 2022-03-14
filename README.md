@@ -79,7 +79,19 @@
 * 使用该程序，不能长时间调用，否则会出现**高频**访问，导致查找不到，需要用动态代理才行。
 * 该网易云所实现的功能并不能完全适用于所有网友，必须定制，如果有需求，可以联系我。
 
+### core.js
+```js
+function d(d, e, f, g) {
+        var h = {},
+            i = a(16);
+        console.log("1=====> " + d);
+		console.log("2=====> " + e);
+		console.log("3=====> " + f);
+		console.log("4=====> " + g);
+        return h.encText = b(d, g), h.encText = b(h.encText, i), h.encSecKey = c(i, e, f), h
+    }
 
+``
 
 ---
 
